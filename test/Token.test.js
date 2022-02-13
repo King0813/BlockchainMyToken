@@ -156,7 +156,7 @@ contract('Token', ([deployer, receiver, exchange]) => {
 		})
 	})
 
-describe('sending tokens', () => {
+describe('delegated token transfers', () => {
 
 		let result
 		let amount
@@ -184,6 +184,11 @@ describe('sending tokens', () => {
 				balanceOf.toString().should.equal(tokens(100).toString())
 			})
 
+			it("resets the allowance", async () => {
+				const allowance = await token.allowance(deployer, exchange)
+				allowance.toString().should.equal('0')
+			})
+
 			it('emits a transfer event', async () => {
 				const log = result.logs[0]
 				log.event.should.equal('Transfer')
@@ -198,28 +203,17 @@ describe('sending tokens', () => {
 
 		describe('failure', async () => {
 
-		// 	// it('rejects insuffiecient balances', async () => {
-		// 	// 	let invalidAmount
-		// 	// 	invalidAmount = tokens(100000000) // 100 million -- greater than total supply
-		// 	// 	await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT);
-
-
-		// 	// 	// Attempt transfer tokens, when you have none
-
-		// 	// 	invalidAmount = tokens(100000000) // recipient has no tokens
-		// 	// 	await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT);
-
-		// 	// })
-
-		// 	// it('rejects invalid recipients', async () => {
-
-		// 	// 	await token.transfer(0x0, amount, {from: deployer}).should.be.rejected
-		// 	// })
-
-		//})
+			it('rejects insuffiecient balances', async () => {
+				const invalidAmount =  tokens(100000000)
+				await token.transferFrom(deployer, receiver, invalidAmount, { from: exchange}).should.be.rejectedWith(EVM_REVERT)
 	
+			})
+		})
 
-	 
+		describe('failure', () => {
+			it('rejects invalid recipients', async () => {
+				await token.transferFrom(deployer, 0x0, amount, { from: exchange}).should.be.rejected
+			})
 		})
 	})
 })
