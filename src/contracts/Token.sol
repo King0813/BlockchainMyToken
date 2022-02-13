@@ -49,9 +49,10 @@ contract Token {
 	function _transfer(address _from, address _to, uint256 _value) internal {
 
 		require(_to != address(0));
-		balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+		balanceOf[_from] = balanceOf[_from].sub(_value);
 		balanceOf[_to] = balanceOf[_to].add(_value);
 		emit Transfer(msg.sender, _to, _value); 
+
 
 	}
 
@@ -73,12 +74,4 @@ contract Token {
 	}
 
 	// transfer from
-
-
-
-
-
-
-
-
 }
